@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 
 function App() {
-  const [activePage, setActivePage] = useState('home');
+  const [_, setActivePage] = useState('home');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

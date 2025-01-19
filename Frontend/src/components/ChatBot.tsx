@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Close } from "@mui/icons-material";
 import { AiOutlineLoading } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";

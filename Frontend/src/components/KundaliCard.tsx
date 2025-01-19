@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext'; // Assuming theme context is available
 import { AwesomeButton } from 'react-awesome-button';
+import 'react-awesome-button/dist/styles.css'; // Make sure this import is present
 
 // Define types for the Yoga Data and Astrology Card props
 
@@ -27,12 +28,10 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({
     has_mangal_dosha,
     mangal_desc,
 }) => {
-    const [text,setText] = useState("")
-    const { theme } = useTheme(); // Get current theme from context\
-    console.log(JSON.stringify({
-        "message": "Give Career Guidance, Relationships,Personal Gropwth, Family and Social Connections, gemstones suggestions based on data"
-    }));
-    
+    const [text, setText] = useState("");
+    const { theme } = useTheme(); // Get current theme from context
+    const [isDialogOpen, setIsDialogOpen] = useState(false); // Manage dialog state
+
     const fetchDATA = async () => {
         try {
             const response = await fetch("http://localhost:5000/analyze", {
@@ -51,15 +50,22 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({
 
             const json = await response.json();  // Parse JSON response
             const text = json.outputs[0].outputs[0].messages[0].message;
-            setText(text);  // Assuming setText is a state setter function
+            setText(text);  // Set the fetched text
+            setIsDialogOpen(true); // Open dialog box when text is available
 
         } catch (error) {
             console.error('Error fetching data:', error);  // Log any errors
         }
     };
+
+    // Close dialog when user presses the close button
+    const closeDialog = () => {
+        setIsDialogOpen(false);
+    };
+
     return (
         <motion.div
-            className={`items-center justify-center${theme === 'light' ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gradient-to-r from-black to-blue-900'
+            className={`items-center justify-center ${theme === 'light' ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gradient-to-r from-black to-blue-900'
                 } text-white p-6 rounded-lg shadow-lg max-w-md mx-auto`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -75,25 +81,35 @@ const AstrologyCard: React.FC<AstrologyCardProps> = ({
 
             <h4 className="text-xl font-bold mt-4">Mangal Dosha:</h4>
             <p className="text-lg">{has_mangal_dosha ? mangal_desc : 'No Mangal Dosha'}</p>
-            {
-                text != "" ? 
-                    <div className="mt-6 h-28 overflow-y-scroll">
-                        {
-                            text
-                        }
-                    </div> : <AwesomeButton
-                        type='primary'
-                        onPress={() => {
-                            fetchDATA()
-                        }}
-                    >
-                        Generate More Insights
-                    </AwesomeButton>
-            }
-            
+
+            <AwesomeButton
+                type='primary'
+                onPress={() => {
+                    fetchDATA();
+                }}
+            >
+                Generate More Insights
+            </AwesomeButton>
+
+            {/* Dialog Box to display fetched text */}
+            {isDialogOpen && (
+                <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full">
+                        <h3 className="text-2xl font-bold mb-4">Generated Insights</h3>
+                        <div className="mb-4 h-96 overflow-y-scroll">
+                            <p>{text}</p>
+                        </div>
+                        <AwesomeButton
+                            type='secondary'
+                            onPress={closeDialog}
+                        >
+                            Close
+                        </AwesomeButton>
+                    </div>
+                </div>
+            )}
         </motion.div>
     );
 };
-
 
 export default AstrologyCard;
