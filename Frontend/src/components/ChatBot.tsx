@@ -3,15 +3,19 @@ import { Close } from "@mui/icons-material";
 import { AiOutlineLoading } from "react-icons/ai";
 import ReactMarkdown from "react-markdown";
 
-export default function ChatBot({ setIsChatBotOpen, users }) {
-  const [userInput, setUserInput] = useState("");
-  const [chatHistory, setChatHistory] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(() =>
-    users && users.length > 0 ? users[0].username : ""
-  );
+interface ChatBotProps {
+  setIsChatBotOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+interface ChatMessage {
+  type: "user" | "bot";
+  message: string;
+}
+
+const ChatBot: React.FC<ChatBotProps> = ({ setIsChatBotOpen }) => {
+  const [userInput, setUserInput] = useState<string>("");
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSend = async () => {
     if (userInput.trim() === "") return;
@@ -28,7 +32,6 @@ export default function ChatBot({ setIsChatBotOpen, users }) {
         },
         body: JSON.stringify({
           message: userInput,
-          user_name: user,
         }),
       });
       const responseJson = await botResponseText.json();
@@ -51,42 +54,11 @@ export default function ChatBot({ setIsChatBotOpen, users }) {
     setIsChatBotOpen(false);
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
-
-  const handleUserSelect = (selectedUser) => {
-    setChatHistory([]);
-    setUser(selectedUser);
-    setDropdownOpen(false);
-  };
-
   return (
     <div className="w-full h-full bg-gray-900 flex flex-col p-4 border-2 border-white-500 rounded-md relative">
       {/* Close button at the top right */}
-
       <div className="header flex flex-row items-center gap-6 justify-center h-8">
         <h2 className="text-white text-2xl text-center">ChatBot</h2>
-        <div className="relative">
-          <span className="text-white cursor-pointer" onClick={toggleDropdown}>
-            {`User: ${user}`}
-          </span>
-          {dropdownOpen && (
-            <div className="absolute bg-white text-black p-2 rounded-lg shadow-md mt-2 w-44 h-64 overflow-scroll overflow-x-hidden ">
-              <ul>
-                {users.map(({ username }) => (
-                  <li
-                    className="p-1 cursor-pointer hover:bg-gray-200"
-                    key={username}
-                    onClick={() => handleUserSelect(username)}
-                  >
-                    {username}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
         {loading && (
           <AiOutlineLoading className="text-white animate-spin bg-slate-900" />
         )}
@@ -103,16 +75,14 @@ export default function ChatBot({ setIsChatBotOpen, users }) {
           {chatHistory.map((chat, index) => (
             <div
               key={index}
-              className={`flex ${
-                chat.type === "user" ? "justify-start" : "justify-end"
-              }`}
+              className={`flex ${chat.type === "user" ? "justify-start" : "justify-end"
+                }`}
             >
               <div
-                className={`max-w-xs p-3 rounded-lg ${
-                  chat.type === "user"
+                className={`max-w-xs p-3 rounded-lg ${chat.type === "user"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-700 text-white"
-                }`}
+                  }`}
               >
                 <ReactMarkdown>{chat.message}</ReactMarkdown>
               </div>
@@ -126,19 +96,20 @@ export default function ChatBot({ setIsChatBotOpen, users }) {
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          className="w-full p-2 rounded-l-lg text-black"
+          className="w-full p-2 rounded-l-lg text-white"
           placeholder="Type your message..."
         />
         <button
           onClick={handleSend}
-          className={`p-2 ${
-            loading ? "bg-gray-700" : "bg-blue-500"
-          } text-white rounded-r-lg ml-2`}
-          disabled={loading || user === "Click to set user"}
+          className={`p-2 ${loading ? "bg-gray-700" : "bg-blue-500"
+            } text-white rounded-r-lg ml-2`}
+          disabled={loading || userInput === ""}
         >
           Send
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default ChatBot;

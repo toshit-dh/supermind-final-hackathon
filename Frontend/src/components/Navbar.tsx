@@ -19,7 +19,7 @@ const Navbar = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <button onClick={() => setActivePage('home')} className="text-2xl font-bold">Hackathon</button>
+          <button onClick={() => setActivePage('home')} className="text-2xl font-bold">SoulBuddy</button>
         </motion.div>
         <motion.ul
           initial={{ opacity: 0, x: 50 }}

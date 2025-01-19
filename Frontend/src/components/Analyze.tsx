@@ -1,22 +1,9 @@
-import  { useState, useEffect } from "react";
+import  { useState } from "react";
 import ChatBot from "./ChatBot"
 import { ChatBubbleOutlineRounded } from "@mui/icons-material";
+import Content from "./Content";
 export default function Home() {
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    async function fetch_users() {
-      try {
-        const usersText = await fetch("http://localhost:5000/fetch?limit=50");
-        const usersJson = await usersText.json();
-        setUsers(usersJson);
-        console.log(usersJson);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetch_users();
-  }, []);
   return (
     <>
       <div
@@ -26,7 +13,7 @@ export default function Home() {
         }}
       >
         <div className="relative z-10 text-center bg-slate-500p-8 rounded-xl shadow-lg h-4/5 w-4/5">
-          <p>Content</p>
+          <Content/>
         </div>
       </div>
       {
@@ -39,7 +26,7 @@ export default function Home() {
           }}
         >
           {isChatBotOpen ? (
-            <ChatBot setIsChatBotOpen={setIsChatBotOpen} users={users} />
+            <ChatBot setIsChatBotOpen={setIsChatBotOpen} />
           ) : (
             <button onClick={() => setIsChatBotOpen(true)}>
               <ChatBubbleOutlineRounded />
