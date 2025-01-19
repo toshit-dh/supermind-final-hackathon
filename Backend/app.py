@@ -1,4 +1,4 @@
-
+from crypt import methods
 
 import requests
 from flask import Flask, request, jsonify
@@ -18,6 +18,13 @@ app = Flask(__name__)
 db = connect()
 
 CORS(app)
+
+
+@app.route("/",methods=["GET"])
+def hi():
+    return jsonify({"message": "hi"}),200
+
+
 @app.route("/fetch", methods=["GET"])
 def fetch_data():
     try:
